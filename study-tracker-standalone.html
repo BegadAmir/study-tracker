@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>متابعة المذاكرة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&amp;display=swap">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#1B1F3B; --paper:#F6F4EE; --card:#FFFFFF; --border:#E3E0D6;
+  --accent:#2C5F6F; --accent-ink:#FFFFFF;
+  --danger:#A63A2C; --success:#4C7A3F; --warn:#C08A2E; --muted:#6B7280;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#EDEBFF; --paper:#12141F; --card:#1B1E2E; --border:#2B2E42;
+    --accent:#6FB6CC; --accent-ink:#0B1420;
+    --danger:#E06A54; --success:#7FBF6E; --warn:#E0B24E; --muted:#9AA0B4;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#EDEBFF; --paper:#12141F; --card:#1B1E2E; --border:#2B2E42;
+  --accent:#6FB6CC; --accent-ink:#0B1420;
+  --danger:#E06A54; --success:#7FBF6E; --warn:#E0B24E; --muted:#9AA0B4;
+}
+*,*::before,*::after{box-sizing:inherit;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Cairo',Tahoma,Arial,sans-serif;}
+header{padding:18px 16px 10px;}
+header h1{font-size:1.3rem;margin:0 0 2px;font-weight:700;}
+header .date{color:var(--muted);font-size:.83rem;}
+.stats{display:flex;gap:8px;padding:0 16px 12px;}
+.stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;text-align:center;}
+.stat b{display:block;font-size:1.35rem;}
+.stat span{font-size:.7rem;color:var(--muted);}
+main{padding:0 16px 96px;max-width:520px;margin:0 auto;}
+.view{display:none;}
+h2.sec-title{font-size:.92rem;margin:16px 0 8px;color:var(--muted);font-weight:600;}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);
+  border-radius:999px;padding:5px 10px;font-size:.78rem;margin:0 6px 6px 0;}
+.import-cta{display:block;width:100%;margin:6px 0 16px;padding:12px;border-radius:14px;
+  border:1.5px dashed var(--accent);background:transparent;color:var(--accent);font-size:.88rem;font-family:inherit;}
+.import-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.83rem;}
+.import-item input{width:auto!important;}
+.import-item small{display:block;color:var(--muted);}
+.imp-card{border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--paper);}
+.imp-card .row2{gap:6px;margin-bottom:6px;}
+.imp-card input,.imp-card select{padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-family:inherit;font-size:.82rem;}
+.imp-card>input{width:100%;}
+.imp-card .row2>input,.imp-card .row2>select{flex:1;min-width:0;}
+.check-inline{display:flex;align-items:center;flex:0 0 auto!important;}
+.check-inline input{width:auto!important;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 14px;margin-bottom:10px;}
+.card.backlog{border-inline-start:4px solid var(--danger);}
+.card.done{opacity:.6;}
+.card-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px;}
+.subj{font-size:.75rem;color:var(--muted);}
+.badge{font-size:.66rem;padding:2px 7px;border-radius:999px;background:var(--paper);border:1px solid var(--border);color:var(--muted);}
+.badge.new{background:var(--accent);color:var(--accent-ink);border:none;}
+.badge.overdue{background:var(--danger);color:#fff;border:none;}
+.badge.prio-high{background:var(--warn);color:#1B1F3B;border:none;}
+.card-title{font-weight:600;font-size:.97rem;}
+.card-title.strike{text-decoration:line-through;}
+.card-notes{color:var(--muted);font-size:.81rem;margin-top:3px;}
+.card-due{font-size:.77rem;color:var(--muted);margin-top:4px;}
+.progress-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.progress-bar{flex:1;height:7px;background:var(--paper);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+.progress-fill{height:100%;background:var(--accent);}
+.progress-txt{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+.stepper{display:flex;gap:6px;margin-top:6px;}
+.stepper button{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:1rem;}
+.card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.card-actions button,.card-actions span.done-date{font-size:.77rem;padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink);}
+.btn-done:active{background:var(--success);color:#fff;border-color:var(--success);}
+.empty,.muted{color:var(--muted);font-size:.85rem;padding:10px 0;}
+.filters{display:flex;gap:8px;margin:14px 0 10px;flex-wrap:wrap;}
+.filters select{flex:1;}
+.filter-chip{padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-size:.81rem;font-family:inherit;}
+.filter-chip.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+select.filter-select{padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-size:.81rem;font-family:inherit;}
+nav.tabbar{position:fixed;bottom:0;inset-inline:0;background:var(--card);border-top:1px solid var(--border);
+  display:flex;padding-bottom:env(safe-area-inset-bottom,0px);}
+nav.tabbar button{flex:1;background:none;border:none;padding:10px 0 8px;color:var(--muted);font-size:.68rem;font-family:inherit;}
+nav.tabbar button .ic{display:block;font-size:1.2rem;margin-bottom:2px;}
+nav.tabbar button.active{color:var(--accent);}
+.fab{position:fixed;bottom:calc(70px + env(safe-area-inset-bottom,0px));inset-inline-end:16px;
+  width:54px;height:54px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+  border:none;font-size:1.6rem;box-shadow:0 6px 16px rgba(0,0,0,.25);}
+.modal{position:fixed;inset:0;display:none;align-items:flex-end;z-index:50;}
+.modal.show{display:flex;}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5);}
+.modal-content{position:relative;background:var(--card);width:100%;max-height:88vh;overflow:auto;
+  border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));}
+.modal-content h3{margin:0 0 12px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:4px;}
+.field input,.field select,.field textarea{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--border);
+  background:var(--paper);color:var(--ink);font-family:inherit;font-size:.9rem;}
+.row2{display:flex;gap:10px;}
+.row2 .field{flex:1;}
+.check-row{display:flex;align-items:center;gap:8px;}
+.check-row input{width:auto!important;}
+.check-row label{margin:0;font-size:.85rem;color:var(--ink);}
+.modal-actions{display:flex;gap:10px;margin-top:6px;}
+.modal-actions button{flex:1;padding:11px;border-radius:12px;border:none;font-size:.92rem;font-family:inherit;}
+.btn-primary{background:var(--accent);color:var(--accent-ink);}
+.btn-ghost{background:var(--paper);color:var(--ink);border:1px solid var(--border)!important;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>📚 متابعة المذاكرة</h1>
+  <div class="date" id="today-label">الأحد، ٢٧ سبتمبر</div>
+</header>
+<div class="stats">
+  <div class="stat"><b id="stat-backlog">7</b><span>متراكم</span></div>
+  <div class="stat"><b id="stat-due">0</b><span>تاسكات اليوم</span></div>
+  <div class="stat"><b id="stat-teacher">0</b><span>واجبات الدروس</span></div>
+</div>
+<main>
+  <section id="view-home" class="view" style="display: block;">
+    <button class="import-cta" id="import-btn">📥 استيراد تاسكات من واتساب</button>
+    <h2 class="sec-title">🧱 المتراكم</h2>
+    <div id="home-backlog-list"></div>
+  </div></div>
+    <h2 class="sec-title">📝 المطلوب دلوقتي</h2>
+    <div id="home-tasks-list"></div>
+  </div></div>
+  </section>
+
+  <section id="view-tasks" class="view" style="display: none;">
+    <div class="filters">
+      <button class="filter-chip active" data-filter="all">الكل</button>
+      <button class="filter-chip" data-filter="teacher">واجبات المدرسين</button>
+      <button class="filter-chip" data-filter="doctor">مهام الدكتور</button>
+    </div>
+    <div id="tasks-list"></div>
+  </div></div>
+  </section>
+
+  <section id="view-backlog" class="view" style="display: none;">
+    <button class="import-cta" id="share-btn">📤 ابعت المتراكم للدكتور</button>
+    <div class="filters">
+      <select id="bl-subject" class="filter-select">
+        <option value="all">كل المواد</option>
+        <option value="عربي">عربي</option><option value="كيمياء">كيمياء</option>
+        <option value="فيزياء">فيزياء</option><option value="بحتة">بحتة</option>
+        <option value="ميكانيكا">ميكانيكا</option><option value="إنجليزي">إنجليزي</option>
+        <option value="ألماني">ألماني</option><option value="عام">عام/آخر</option>
+      </select>
+      <select id="bl-type" class="filter-select">
+        <option value="all">كل الأنواع</option>
+        <option value="واجب">واجب</option><option value="مراجعة">مراجعة</option>
+        <option value="حفظ">حفظ</option><option value="متراكم">متراكم</option>
+        <option value="مذاكرة مطلوبة">مذاكرة مطلوبة</option><option value="أخرى">أخرى</option>
+      </select>
+    </div>
+    <div id="backlog-list"></div>
+  </div></div>
+  </section>
+
+  <section id="view-archive" class="view" style="display: none;">
+    <h2 class="sec-title">الأرشيف</h2>
+    <div id="archive-list"></div>
+  </section>
+</main>
+
+<button class="fab" id="fab" aria-label="إضافة مهمة">+</button>
+
+<nav class="tabbar">
+  <button id="nav-home" class="active"><span class="ic">🏠</span>الرئيسية</button>
+  <button id="nav-tasks" class=""><span class="ic">📝</span>المهام</button>
+  <button id="nav-backlog" class=""><span class="ic">🧱</span>المتراكم</button>
+  <button id="nav-archive" class=""><span class="ic">📦</span>الأرشيف</button>
+</nav>
+
+<div class="modal" id="modal">
+  <div class="modal-backdrop" id="modal-overlay"></div>
+  <div class="modal-content">
+    <h3 id="modal-title">تعديل المهمة</h3>
+    <form id="task-form">
+      <div class="row2">
+        <div class="field"><label>المصدر</label>
+          <select id="f-origin"><option value="teacher">مدرسة</option><option value="doctor">الدكتور</option></select>
+        </div>
+        <div class="field"><label>النوع</label>
+          <select id="f-type">
+            <option value="واجب">واجب</option><option value="مراجعة">مراجعة</option>
+            <option value="حفظ">حفظ</option><option value="متراكم">متراكم</option>
+            <option value="مذاكرة مطلوبة">مذاكرة مطلوبة</option><option value="أخرى">أخرى</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>المادة</label>
+        <select id="f-subject">
+          <option value="عربي">عربي</option><option value="كيمياء">كيمياء</option>
+          <option value="فيزياء">فيزياء</option><option value="بحتة">بحتة</option>
+          <option value="ميكانيكا">ميكانيكا</option><option value="إنجليزي">إنجليزي</option>
+          <option value="ألماني">ألماني</option><option value="عام">عام/آخر</option>
+        </select>
+      </div>
+      <div class="field"><label>العنوان</label><input id="f-title" type="text" placeholder="مثال: حل تمارين الوحدة 3" required=""></div>
+      <div class="field"><label>تفاصيل (اختياري)</label><textarea id="f-notes" rows="2"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>تاريخ الاستحقاق (اختياري)</label><input id="f-due" type="date"></div>
+        <div class="field"><label>الأولوية</label>
+          <select id="f-priority"><option value="عالي">عالية</option><option value="متوسط" selected="">متوسطة</option><option value="منخفض">منخفضة</option></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label class="">العدد الكلي (اختياري)</label><input id="f-total" type="number" min="0" placeholder="مثال: 30"></div>
+        <div class="field"><label>المنجز</label><input id="f-done" type="number" min="0" placeholder="0"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="modal-close">إلغاء</button>
+        <button type="submit" class="btn-primary">حفظ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="import-modal">
+  <div class="modal-backdrop" id="import-overlay"></div>
+  <div class="modal-content">
+    <h3>استيراد تاسكات من واتساب</h3>
+    <div class="field"><label>المصدر</label>
+      <select id="imp-origin"><option value="doctor" selected="">الدكتور</option><option value="teacher">مدرسة</option></select>
+    </div>
+    <div class="field"><label>ملف PDF بالواجب (اختياري)</label>
+      <input type="file" id="imp-pdf" accept="application/pdf">
+      <div class="muted" id="imp-pdf-status" style="font-size:.75rem;margin-top:4px;padding:0;"></div>
+    </div>
+    <div class="field"><label>أو الصق نص الرسالة هنا</label>
+      <textarea id="imp-text" rows="6" placeholder="مثلا: بكرة عايزك تحل تمارين الوحدة 3 كيمياء وتحفظ درس 5 ألماني..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" id="import-close">إلغاء</button>
+      <button type="button" class="btn-primary" id="imp-analyze">🔍 حلل الرسالة</button>
+    </div>
+    <div id="imp-results"></div>
+  </div>
+</div>
+
+<div class="modal" id="share-modal">
+  <div class="modal-backdrop" id="share-overlay"></div>
+  <div class="modal-content">
+    <h3>مشاركة المتراكم</h3>
+    <div class="field"><textarea id="share-text" rows="10" readonly="" style="font-size:.85rem;"></textarea></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" id="share-close">إغلاق</button>
+      <button type="button" class="btn-primary" id="share-copy">📋 نسخ</button>
+    </div>
+    <button type="button" class="import-cta" id="share-native" style="margin-top: 10px; display: block;">📤 مشاركة مباشرة (واتساب وغيره)</button>
+  </div>
+</div>
+
+<script id="state-data" type="application/json">{"tasks":[{"id":"seed1","origin":"doctor","type":"مذاكرة مطلوبة","subject":"كيمياء","title":"درس الرابع","notes":"","dueDate":"","priority":"عالي","total":null,"done":0,"backlog":false,"isDone":false,"createdAt":1700000000000,"completedAt":null},{"id":"seed2","origin":"teacher","type":"متراكم","subject":"كيمياء","title":"الدرس الخامس","notes":"","dueDate":"","priority":"عالي","total":null,"done":0,"backlog":false,"isDone":true,"createdAt":1700000000000,"completedAt":1790473028263},{"id":"seed3","origin":"teacher","type":"مذاكرة مطلوبة","subject":"عربي","title":"علم المعاني","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":false,"isDone":true,"createdAt":1700000000000,"completedAt":1790473029612},{"id":"seed4","origin":"teacher","type":"واجب","subject":"إنجليزي","title":"مفردات وتمارين الوحدة الأولى","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":false,"isDone":true,"createdAt":1700000000000,"completedAt":1790473041046},{"id":"seed5","origin":"teacher","type":"متراكم","subject":"ألماني","title":"حفظ بعض الكلمات  ، و حفظ ال Grammar","notes":"الحجات اللي خدنا ف الدرس احنا مخدناش الدرس الأول كاملاً","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":true,"isDone":true,"createdAt":1700000000000,"completedAt":1790473037543},{"id":"muj0veohmcl81","createdAt":1790465402897,"isDone":true,"completedAt":1790473042354,"origin":"doctor","type":"مذاكرة مطلوبة","subject":"ألماني","title":"مذاكرة درس ألماني","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":false},{"id":"muj5lxxkj94fm","createdAt":1790473359369,"isDone":false,"completedAt":null,"origin":"doctor","type":"مذاكرة مطلوبة","subject":"ألماني","title":"ما أخدناه من الدرس الاول","notes":"حفظ كلمات و مراجعه جرامر","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":false},{"id":"muj5pig18zaw4","createdAt":1790473525921,"isDone":false,"completedAt":null,"origin":"teacher","type":"واجب","subject":"فيزياء","title":"حل مسائل كيرشوف و حل كام مسأله الدرس الأخير","notes":"","dueDate":"2026-09-29","priority":"متوسط","total":null,"done":0,"backlog":false},{"id":"mul1lnz1bls6x","createdAt":1790587560350,"isDone":false,"completedAt":null,"origin":"teacher","type":"متراكم","subject":"كيمياء","title":"الدرس الخامس كيمياء عضويه","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":true},{"id":"mul1n296a8ghu","createdAt":1790587625514,"isDone":false,"completedAt":null,"origin":"teacher","type":"متراكم","subject":"ميكانيكا","title":"الدرس الاول الوحده الثانيه","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":true},{"id":"mul1o1er9cfc3","createdAt":1790587671075,"isDone":false,"completedAt":null,"origin":"teacher","type":"متراكم","subject":"بحتة","title":"الدرس الاول الوحده الاولي","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":true},{"id":"mul1okoveg14v","createdAt":1790587696063,"isDone":false,"completedAt":null,"origin":"teacher","type":"متراكم","subject":"بحتة","title":"الدرس الثاني الوحده الاولي","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":true},{"id":"mul1t3ezws9n0","createdAt":1790587906955,"isDone":false,"completedAt":null,"origin":"teacher","type":"متراكم","subject":"ميكانيكا","title":"الدرس الثاني الوحده الثانيه","notes":"","dueDate":"","priority":"متوسط","total":null,"done":0,"backlog":true}],"updatedAt":1790587906956}</script>
+<script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script id="app-logic">
+const $=(s,p=document)=>p.querySelector(s);
+const $$=(s,p=document)=>[...p.querySelectorAll(s)];
+const LS_KEY='study_tracker_v1';
+const SUBJECTS=[
+ {key:'عربي',label:'عربي',color:'#6f9c76'},
+ {key:'كيمياء',label:'كيمياء',color:'#4285f4'},
+ {key:'فيزياء',label:'فيزياء',color:'#16a2a2'},
+ {key:'بحتة',label:'بحتة',color:'#8e44ad'},
+ {key:'ميكانيكا',label:'ميكانيكا',color:'#b39ddb'},
+ {key:'إنجليزي',label:'إنجليزي',color:'#ec7c8d'},
+ {key:'ألماني',label:'ألماني',color:'#e0b400'},
+ {key:'عام',label:'عام/آخر',color:'#9ca3af'},
+];
+const PRIORITY_W={'عالي':3,'متوسط':2,'منخفض':1};
+const TYPES=['واجب','مراجعة','حفظ','متراكم','مذاكرة مطلوبة','أخرى'];
+
+let state={tasks:[]};
+let artifactApi=null;
+let sampleApi=null;
+let currentTab='home';
+let editingId=null;
+let taskFilter='all';
+let backlogFilter={subject:'all',type:'all'};
+let importCandidates=[];
+
+function todayISO(){return new Date().toISOString().slice(0,10);}
+function fmtDate(v){
+  if(!v) return '';
+  const d=typeof v==='number'?new Date(v):new Date(v+'T00:00:00');
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  return d.getDate()+' '+months[d.getMonth()];
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function subjectInfo(key){return SUBJECTS.find(s=>s.key===key)||{label:key||'عام',color:'#9ca3af'};}
+
+function toast(msg){
+  let t=document.getElementById('app-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='app-toast';
+    t.style.cssText='position:fixed;bottom:78px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:.82rem;z-index:200;max-width:88%;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,.3);';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.display='block';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{ t.style.display='none'; },2800);
+}
+
+function confirmDialog(message){
+  return new Promise(resolve=>{
+    let m=document.getElementById('confirm-modal');
+    if(!m){
+      m=document.createElement('div');
+      m.id='confirm-modal';
+      m.className='modal';
+      m.innerHTML='<div class="modal-backdrop"></div><div class="modal-content"><p id="confirm-msg" style="margin:0 0 16px;"></p><div class="modal-actions"><button type="button" class="btn-ghost" id="confirm-no">إلغاء</button><button type="button" class="btn-primary" id="confirm-yes">تأكيد</button></div></div>';
+      document.body.appendChild(m);
+    }
+    document.getElementById('confirm-msg').textContent=message;
+    m.classList.add('show');
+    const done=val=>{ m.classList.remove('show'); resolve(val); };
+    document.getElementById('confirm-yes').onclick=()=>done(true);
+    document.getElementById('confirm-no').onclick=()=>done(false);
+    m.querySelector('.modal-backdrop').onclick=()=>done(false);
+  });
+}
+
+async function getArtifactApi(){
+  try{
+    if(window.claude && typeof window.claude.use==='function'){
+      return await window.claude.use('artifact');
+    }
+  }catch(e){}
+  return null;
+}
+async function getSampleApi(){
+  try{
+    if(window.claude && typeof window.claude.use==='function'){
+      return await window.claude.use('sample');
+    }
+  }catch(e){}
+  return null;
+}
+
+function loadState(){
+  let seeded={tasks:[]};
+  try{ seeded=JSON.parse($('#state-data').textContent)||{tasks:[]}; }catch(e){}
+  let local=null;
+  try{ local=JSON.parse(localStorage.getItem(LS_KEY)); }catch(e){}
+  if(local && (local.updatedAt||0) > (seeded.updatedAt||0)) state=local;
+  else state=seeded;
+  if(!state.tasks) state.tasks=[];
+}
+
+function normalizeBacklog(){
+  const today=todayISO();
+  state.tasks.forEach(t=>{
+    if(!t.isDone){
+      if((t.dueDate && t.dueDate<today) || t.type==='متراكم') t.backlog=true;
+    }
+  });
+}
+
+const SHELL_A=`<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>متابعة المذاكرة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&amp;display=swap">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#1B1F3B; --paper:#F6F4EE; --card:#FFFFFF; --border:#E3E0D6;
+  --accent:#2C5F6F; --accent-ink:#FFFFFF;
+  --danger:#A63A2C; --success:#4C7A3F; --warn:#C08A2E; --muted:#6B7280;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#EDEBFF; --paper:#12141F; --card:#1B1E2E; --border:#2B2E42;
+    --accent:#6FB6CC; --accent-ink:#0B1420;
+    --danger:#E06A54; --success:#7FBF6E; --warn:#E0B24E; --muted:#9AA0B4;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#EDEBFF; --paper:#12141F; --card:#1B1E2E; --border:#2B2E42;
+  --accent:#6FB6CC; --accent-ink:#0B1420;
+  --danger:#E06A54; --success:#7FBF6E; --warn:#E0B24E; --muted:#9AA0B4;
+}
+*,*::before,*::after{box-sizing:inherit;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Cairo',Tahoma,Arial,sans-serif;}
+header{padding:18px 16px 10px;}
+header h1{font-size:1.3rem;margin:0 0 2px;font-weight:700;}
+header .date{color:var(--muted);font-size:.83rem;}
+.stats{display:flex;gap:8px;padding:0 16px 12px;}
+.stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;text-align:center;}
+.stat b{display:block;font-size:1.35rem;}
+.stat span{font-size:.7rem;color:var(--muted);}
+main{padding:0 16px 96px;max-width:520px;margin:0 auto;}
+.view{display:none;}
+h2.sec-title{font-size:.92rem;margin:16px 0 8px;color:var(--muted);font-weight:600;}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);
+  border-radius:999px;padding:5px 10px;font-size:.78rem;margin:0 6px 6px 0;}
+.import-cta{display:block;width:100%;margin:6px 0 16px;padding:12px;border-radius:14px;
+  border:1.5px dashed var(--accent);background:transparent;color:var(--accent);font-size:.88rem;font-family:inherit;}
+.import-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.83rem;}
+.import-item input{width:auto!important;}
+.import-item small{display:block;color:var(--muted);}
+.imp-card{border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--paper);}
+.imp-card .row2{gap:6px;margin-bottom:6px;}
+.imp-card input,.imp-card select{padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-family:inherit;font-size:.82rem;}
+.imp-card>input{width:100%;}
+.imp-card .row2>input,.imp-card .row2>select{flex:1;min-width:0;}
+.check-inline{display:flex;align-items:center;flex:0 0 auto!important;}
+.check-inline input{width:auto!important;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 14px;margin-bottom:10px;}
+.card.backlog{border-inline-start:4px solid var(--danger);}
+.card.done{opacity:.6;}
+.card-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px;}
+.subj{font-size:.75rem;color:var(--muted);}
+.badge{font-size:.66rem;padding:2px 7px;border-radius:999px;background:var(--paper);border:1px solid var(--border);color:var(--muted);}
+.badge.new{background:var(--accent);color:var(--accent-ink);border:none;}
+.badge.overdue{background:var(--danger);color:#fff;border:none;}
+.badge.prio-high{background:var(--warn);color:#1B1F3B;border:none;}
+.card-title{font-weight:600;font-size:.97rem;}
+.card-title.strike{text-decoration:line-through;}
+.card-notes{color:var(--muted);font-size:.81rem;margin-top:3px;}
+.card-due{font-size:.77rem;color:var(--muted);margin-top:4px;}
+.progress-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.progress-bar{flex:1;height:7px;background:var(--paper);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+.progress-fill{height:100%;background:var(--accent);}
+.progress-txt{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+.stepper{display:flex;gap:6px;margin-top:6px;}
+.stepper button{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:1rem;}
+.card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.card-actions button,.card-actions span.done-date{font-size:.77rem;padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink);}
+.btn-done:active{background:var(--success);color:#fff;border-color:var(--success);}
+.empty,.muted{color:var(--muted);font-size:.85rem;padding:10px 0;}
+.filters{display:flex;gap:8px;margin:14px 0 10px;flex-wrap:wrap;}
+.filters select{flex:1;}
+.filter-chip{padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-size:.81rem;font-family:inherit;}
+.filter-chip.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+select.filter-select{padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-size:.81rem;font-family:inherit;}
+nav.tabbar{position:fixed;bottom:0;inset-inline:0;background:var(--card);border-top:1px solid var(--border);
+  display:flex;padding-bottom:env(safe-area-inset-bottom,0px);}
+nav.tabbar button{flex:1;background:none;border:none;padding:10px 0 8px;color:var(--muted);font-size:.68rem;font-family:inherit;}
+nav.tabbar button .ic{display:block;font-size:1.2rem;margin-bottom:2px;}
+nav.tabbar button.active{color:var(--accent);}
+.fab{position:fixed;bottom:calc(70px + env(safe-area-inset-bottom,0px));inset-inline-end:16px;
+  width:54px;height:54px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+  border:none;font-size:1.6rem;box-shadow:0 6px 16px rgba(0,0,0,.25);}
+.modal{position:fixed;inset:0;display:none;align-items:flex-end;z-index:50;}
+.modal.show{display:flex;}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5);}
+.modal-content{position:relative;background:var(--card);width:100%;max-height:88vh;overflow:auto;
+  border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));}
+.modal-content h3{margin:0 0 12px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:4px;}
+.field input,.field select,.field textarea{width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--border);
+  background:var(--paper);color:var(--ink);font-family:inherit;font-size:.9rem;}
+.row2{display:flex;gap:10px;}
+.row2 .field{flex:1;}
+.check-row{display:flex;align-items:center;gap:8px;}
+.check-row input{width:auto!important;}
+.check-row label{margin:0;font-size:.85rem;color:var(--ink);}
+.modal-actions{display:flex;gap:10px;margin-top:6px;}
+.modal-actions button{flex:1;padding:11px;border-radius:12px;border:none;font-size:.92rem;font-family:inherit;}
+.btn-primary{background:var(--accent);color:var(--accent-ink);}
+.btn-ghost{background:var(--paper);color:var(--ink);border:1px solid var(--border)!important;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>📚 متابعة المذاكرة</h1>
+  <div class="date" id="today-label">الأحد، ٢٧ سبتمبر</div>
+</header>
+<div class="stats">
+  <div class="stat"><b id="stat-backlog">7</b><span>متراكم</span></div>
+  <div class="stat"><b id="stat-due">0</b><span>تاسكات اليوم</span></div>
+  <div class="stat"><b id="stat-teacher">0</b><span>واجبات الدروس</span></div>
+</div>
+<main>
+  <section id="view-home" class="view" style="display: block;">
+    <button class="import-cta" id="import-btn">📥 استيراد تاسكات من واتساب</button>
+    <h2 class="sec-title">🧱 المتراكم</h2>
+    <div id="home-backlog-list"></div>
+  </div></div>
+    <h2 class="sec-title">📝 المطلوب دلوقتي</h2>
+    <div id="home-tasks-list"></div>
+  </div></div>
+  </section>
+
+  <section id="view-tasks" class="view" style="display: none;">
+    <div class="filters">
+      <button class="filter-chip active" data-filter="all">الكل</button>
+      <button class="filter-chip" data-filter="teacher">واجبات المدرسين</button>
+      <button class="filter-chip" data-filter="doctor">مهام الدكتور</button>
+    </div>
+    <div id="tasks-list"></div>
+  </div></div>
+  </section>
+
+  <section id="view-backlog" class="view" style="display: none;">
+    <button class="import-cta" id="share-btn">📤 ابعت المتراكم للدكتور</button>
+    <div class="filters">
+      <select id="bl-subject" class="filter-select">
+        <option value="all">كل المواد</option>
+        <option value="عربي">عربي</option><option value="كيمياء">كيمياء</option>
+        <option value="فيزياء">فيزياء</option><option value="بحتة">بحتة</option>
+        <option value="ميكانيكا">ميكانيكا</option><option value="إنجليزي">إنجليزي</option>
+        <option value="ألماني">ألماني</option><option value="عام">عام/آخر</option>
+      </select>
+      <select id="bl-type" class="filter-select">
+        <option value="all">كل الأنواع</option>
+        <option value="واجب">واجب</option><option value="مراجعة">مراجعة</option>
+        <option value="حفظ">حفظ</option><option value="متراكم">متراكم</option>
+        <option value="مذاكرة مطلوبة">مذاكرة مطلوبة</option><option value="أخرى">أخرى</option>
+      </select>
+    </div>
+    <div id="backlog-list"></div>
+  </div></div>
+  </section>
+
+  <section id="view-archive" class="view" style="display: none;">
+    <h2 class="sec-title">الأرشيف</h2>
+    <div id="archive-list"></div>
+  </section>
+</main>
+
+<button class="fab" id="fab" aria-label="إضافة مهمة">+</button>
+
+<nav class="tabbar">
+  <button id="nav-home" class="active"><span class="ic">🏠</span>الرئيسية</button>
+  <button id="nav-tasks" class=""><span class="ic">📝</span>المهام</button>
+  <button id="nav-backlog" class=""><span class="ic">🧱</span>المتراكم</button>
+  <button id="nav-archive" class=""><span class="ic">📦</span>الأرشيف</button>
+</nav>
+
+<div class="modal" id="modal">
+  <div class="modal-backdrop" id="modal-overlay"></div>
+  <div class="modal-content">
+    <h3 id="modal-title">تعديل المهمة</h3>
+    <form id="task-form">
+      <div class="row2">
+        <div class="field"><label>المصدر</label>
+          <select id="f-origin"><option value="teacher">مدرسة</option><option value="doctor">الدكتور</option></select>
+        </div>
+        <div class="field"><label>النوع</label>
+          <select id="f-type">
+            <option value="واجب">واجب</option><option value="مراجعة">مراجعة</option>
+            <option value="حفظ">حفظ</option><option value="متراكم">متراكم</option>
+            <option value="مذاكرة مطلوبة">مذاكرة مطلوبة</option><option value="أخرى">أخرى</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>المادة</label>
+        <select id="f-subject">
+          <option value="عربي">عربي</option><option value="كيمياء">كيمياء</option>
+          <option value="فيزياء">فيزياء</option><option value="بحتة">بحتة</option>
+          <option value="ميكانيكا">ميكانيكا</option><option value="إنجليزي">إنجليزي</option>
+          <option value="ألماني">ألماني</option><option value="عام">عام/آخر</option>
+        </select>
+      </div>
+      <div class="field"><label>العنوان</label><input id="f-title" type="text" placeholder="مثال: حل تمارين الوحدة 3" required=""></div>
+      <div class="field"><label>تفاصيل (اختياري)</label><textarea id="f-notes" rows="2"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>تاريخ الاستحقاق (اختياري)</label><input id="f-due" type="date"></div>
+        <div class="field"><label>الأولوية</label>
+          <select id="f-priority"><option value="عالي">عالية</option><option value="متوسط" selected="">متوسطة</option><option value="منخفض">منخفضة</option></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label class="">العدد الكلي (اختياري)</label><input id="f-total" type="number" min="0" placeholder="مثال: 30"></div>
+        <div class="field"><label>المنجز</label><input id="f-done" type="number" min="0" placeholder="0"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="modal-close">إلغاء</button>
+        <button type="submit" class="btn-primary">حفظ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="import-modal">
+  <div class="modal-backdrop" id="import-overlay"></div>
+  <div class="modal-content">
+    <h3>استيراد تاسكات من واتساب</h3>
+    <div class="field"><label>المصدر</label>
+      <select id="imp-origin"><option value="doctor" selected="">الدكتور</option><option value="teacher">مدرسة</option></select>
+    </div>
+    <div class="field"><label>ملف PDF بالواجب (اختياري)</label>
+      <input type="file" id="imp-pdf" accept="application/pdf">
+      <div class="muted" id="imp-pdf-status" style="font-size:.75rem;margin-top:4px;padding:0;"></div>
+    </div>
+    <div class="field"><label>أو الصق نص الرسالة هنا</label>
+      <textarea id="imp-text" rows="6" placeholder="مثلا: بكرة عايزك تحل تمارين الوحدة 3 كيمياء وتحفظ درس 5 ألماني..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" id="import-close">إلغاء</button>
+      <button type="button" class="btn-primary" id="imp-analyze">🔍 حلل الرسالة</button>
+    </div>
+    <div id="imp-results"></div>
+  </div>
+</div>
+
+<div class="modal" id="share-modal">
+  <div class="modal-backdrop" id="share-overlay"></div>
+  <div class="modal-content">
+    <h3>مشاركة المتراكم</h3>
+    <div class="field"><textarea id="share-text" rows="10" readonly="" style="font-size:.85rem;"></textarea></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" id="share-close">إغلاق</button>
+      <button type="button" class="btn-primary" id="share-copy">📋 نسخ</button>
+    </div>
+    <button type="button" class="import-cta" id="share-native" style="margin-top: 10px; display: block;">📤 مشاركة مباشرة (واتساب وغيره)</button>
+  </div>
+</div>
+
+<script id="state-data" type="application/json">`;
+const SHELL_B=`
+<script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"><\/script>
+<script id="app-logic">`;
+
+async function persistState(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+  if(!artifactApi) return;
+  try{
+    const jsonSafe=JSON.stringify(state).replace(/<\/script/gi,'<\\/script');
+    const appEl=document.getElementById('app-logic');
+    const appSrc=appEl?appEl.textContent:'';
+    const html=SHELL_A+jsonSafe+'<\/script>'+SHELL_B+appSrc+'<\/script>\n</body>\n</html>';
+    await artifactApi.publish(html);
+  }catch(e){ console.error('publish failed',e); }
+}
+
+function save(){
+  state.updatedAt=Date.now();
+  normalizeBacklog();
+  render();
+  persistState();
+}
+
+function taskCardHTML(t){
+  const subj=subjectInfo(t.subject);
+  const overdue=!t.isDone && t.dueDate && t.dueDate<todayISO();
+  const hasTotal=t.total!==null && t.total!==undefined && t.total>0;
+  const pct=hasTotal?Math.min(100,Math.round(((t.done||0)/t.total)*100)):null;
+  return `<div class="card ${t.isDone?'done':''} ${(t.backlog&&!t.isDone)?'backlog':''}">
+    <div class="card-top">
+      <span class="dot" style="background:${subj.color}"></span>
+      <span class="subj">${escapeHtml(subj.label)}</span>
+      <span class="badge">${t.origin==='doctor'?'الدكتور':'مدرسة'}</span>
+      <span class="badge">${escapeHtml(t.type)}</span>
+      ${overdue?'<span class="badge overdue">متأخر</span>':''}
+      ${t.priority==='عالي'?'<span class="badge prio-high">أولوية عالية</span>':''}
+    </div>
+    <div class="card-title ${t.isDone?'strike':''}">${escapeHtml(t.title)}</div>
+    ${t.notes?`<div class="card-notes">${escapeHtml(t.notes)}</div>`:''}
+    ${t.dueDate?`<div class="card-due">📅 ${fmtDate(t.dueDate)}</div>`:''}
+    ${(hasTotal && !t.isDone)?`
+      <div class="progress-row">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="progress-txt">${t.done||0}/${t.total} (${pct}%)</span>
+      </div>
+      <div class="stepper">
+        <button data-action="dec" data-id="${t.id}">−</button>
+        <button data-action="inc" data-id="${t.id}">+</button>
+      </div>`:''}
+    <div class="card-actions">
+      ${!t.isDone?`<button class="btn-done" data-action="done" data-id="${t.id}">تم</button>`:`<span class="done-date">اتعمل يوم ${fmtDate(t.completedAt)}</span>`}
+      ${!t.isDone?`<button data-action="backlog-toggle" data-id="${t.id}">${t.backlog?'إلغاء المتراكم':'ضعها بالمتراكم'}</button>`:''}
+      <button data-action="edit" data-id="${t.id}">تعديل</button>
+      <button data-action="delete" data-id="${t.id}">حذف</button>
+    </div>
+  </div>`;
+}
+
+function renderList(id,list){
+  $('#'+id).innerHTML = list.length? list.map(taskCardHTML).join('') : '<p class="empty">مفيش عناصر هنا حاليًا</p>';
+}
+
+function renderHome(){
+  const active=state.tasks.filter(t=>!t.isDone);
+  const backlog=active.filter(t=>t.backlog).sort((a,b)=>PRIORITY_W[b.priority]-PRIORITY_W[a.priority]);
+  const rest=active.filter(t=>!t.backlog).sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999'));
+  const today=todayISO();
+  const dueToday=active.filter(t=>t.dueDate===today);
+  const teacherCount=active.filter(t=>t.origin==='teacher').length;
+  $('#stat-backlog').textContent=backlog.length;
+  $('#stat-due').textContent=dueToday.length;
+  $('#stat-teacher').textContent=teacherCount;
+  renderList('home-backlog-list', backlog);
+  renderList('home-tasks-list', rest);
+}
+
+function renderTasks(){
+  let list=state.tasks.filter(t=>!t.isDone);
+  if(taskFilter==='teacher') list=list.filter(t=>t.origin==='teacher');
+  if(taskFilter==='doctor') list=list.filter(t=>t.origin==='doctor');
+  list.sort((a,b)=>(PRIORITY_W[b.priority]-PRIORITY_W[a.priority])||((a.dueDate||'9999').localeCompare(b.dueDate||'9999')));
+  renderList('tasks-list', list);
+}
+
+function renderBacklog(){
+  let list=state.tasks.filter(t=>!t.isDone && t.backlog);
+  if(backlogFilter.subject!=='all') list=list.filter(t=>t.subject===backlogFilter.subject);
+  if(backlogFilter.type!=='all') list=list.filter(t=>t.type===backlogFilter.type);
+  list.sort((a,b)=>PRIORITY_W[b.priority]-PRIORITY_W[a.priority]);
+  renderList('backlog-list', list);
+}
+
+function renderArchive(){
+  const list=state.tasks.filter(t=>t.isDone).sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
+  renderList('archive-list', list);
+}
+
+function render(){ renderHome(); renderTasks(); renderBacklog(); renderArchive(); }
+
+function showTab(name){
+  currentTab=name;
+  ['home','tasks','backlog','archive'].forEach(n=>{
+    $('#view-'+n).style.display = n===name?'block':'none';
+    $('#nav-'+n).classList.toggle('active', n===name);
+  });
+}
+
+function openModal(task){
+  editingId=task?task.id:null;
+  $('#modal-title').textContent=task?'تعديل المهمة':'إضافة مهمة جديدة';
+  $('#f-origin').value=task?.origin||'teacher';
+  $('#f-type').value=task?.type||'واجب';
+  $('#f-subject').value=task?.subject||'عربي';
+  $('#f-title').value=task?.title||'';
+  $('#f-notes').value=task?.notes||'';
+  $('#f-due').value=task?.dueDate||'';
+  $('#f-priority').value=task?.priority||'متوسط';
+  $('#f-total').value=(task&&task.total!=null)?task.total:'';
+  $('#f-done').value=(task&&task.done!=null)?task.done:'';
+  $('#modal').classList.add('show');
+}
+function closeModal(){ $('#modal').classList.remove('show'); }
+
+async function submitForm(e){
+  e.preventDefault();
+  const title=$('#f-title').value.trim();
+  if(!title){ toast('اكتب عنوان المهمة الأول'); return; }
+  const subject=$('#f-subject').value;
+  const dup=state.tasks.find(t=>!t.isDone && t.id!==editingId && t.title.trim().toLowerCase()===title.toLowerCase() && t.subject===subject);
+  if(dup){
+    const ok=await confirmDialog('في مهمة شبهها موجودة بالفعل: "'+dup.title+'". تضيفها برضو؟');
+    if(!ok) return;
+  }
+  const totalVal=$('#f-total').value; const doneVal=$('#f-done').value;
+  const existing=editingId?state.tasks.find(x=>x.id===editingId):null;
+  const data={
+    origin:$('#f-origin').value,
+    type:$('#f-type').value,
+    subject,
+    title,
+    notes:$('#f-notes').value.trim(),
+    dueDate:$('#f-due').value,
+    priority:$('#f-priority').value,
+    total: totalVal!==''?parseInt(totalVal,10):null,
+    done: doneVal!==''?parseInt(doneVal,10):0,
+    backlog: (existing?!!existing.backlog:false) || $('#f-type').value==='متراكم',
+  };
+  if(editingId){
+    const t=state.tasks.find(x=>x.id===editingId);
+    Object.assign(t,data);
+  }else{
+    state.tasks.push({id:uid(),createdAt:Date.now(),isDone:false,completedAt:null,...data});
+  }
+  closeModal();
+  save();
+}
+
+async function onCardAction(e){
+  const btn=e.target.closest('[data-action]');
+  if(!btn) return;
+  const id=btn.dataset.id;
+  const t=state.tasks.find(x=>x.id===id);
+  if(!t) return;
+  const action=btn.dataset.action;
+  if(action==='done'){ t.isDone=true; t.completedAt=Date.now(); t.backlog=false; save(); }
+  else if(action==='delete'){
+    const ok=await confirmDialog('متأكد إنك عايز تمسح "'+t.title+'"؟');
+    if(ok){ state.tasks=state.tasks.filter(x=>x.id!==id); save(); }
+  }
+  else if(action==='edit'){ openModal(t); }
+  else if(action==='inc'){ t.done=Math.min((t.total!=null?t.total:Infinity),(t.done||0)+1); save(); }
+  else if(action==='dec'){ t.done=Math.max(0,(t.done||0)-1); save(); }
+  else if(action==='backlog-toggle'){ t.backlog=!t.backlog; save(); }
+}
+
+function openImportModal(){
+  $('#imp-text').value='';
+  $('#imp-pdf').value='';
+  $('#imp-pdf-status').textContent='';
+  $('#imp-results').innerHTML='';
+  importCandidates=[];
+  $('#import-modal').classList.add('show');
+}
+function closeImportModal(){ $('#import-modal').classList.remove('show'); }
+
+async function handlePdfFile(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const status=$('#imp-pdf-status');
+  status.textContent='بستخرج النص من الملف...';
+  try{
+    if(!window.pdfjsLib){ status.textContent='مكتبة قراءة الـ PDF لسه بتحمل، جرب تاني بعد شوية.'; return; }
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    let text='';
+    for(let i=1;i<=pdf.numPages;i++){
+      const page=await pdf.getPage(i);
+      const content=await page.getTextContent();
+      text+=content.items.map(it=>it.str).join(' ')+'\n';
+    }
+    text=text.trim();
+    if(!text){ status.textContent='الملف مش فيه نص واضح (ممكن يكون صفحات ماسحة ضوئيًا).'; return; }
+    const ta=$('#imp-text');
+    ta.value=ta.value.trim()?(ta.value.trim()+'\n\n'+text):text;
+    status.textContent='✅ اتحط نص الملف، دلوقتي دوس "حلل الرسالة"';
+  }catch(err){ console.error(err); status.textContent='معرفتش أقرأ الملف ده.'; }
+}
+
+async function analyzeImport(){
+  const text=$('#imp-text').value.trim();
+  if(!text){ toast('الصق الرسالة الأول'); return; }
+  const btn=$('#imp-analyze');
+  btn.disabled=true; btn.textContent='بحلل...';
+  try{
+    if(!sampleApi) sampleApi=await getSampleApi();
+    if(!sampleApi){ toast('ميزة التحليل التلقائي مش متاحة دلوقتي على حسابك، ضيف التاسكات يدويًا من زر +.'); return; }
+    const prompt='التاريخ النهارده: '+todayISO()+'. دي رسالة واتساب من متابع مذاكرة أو مدرس فيها تاسك أو أكتر. استخرج كل تاسك مستقل كعنصر في JSON array، من غير أي نص أو شرح تاني، بالشكل ده بالظبط لكل عنصر: {"type":"واجب أو مراجعة أو حفظ أو متراكم أو مذاكرة مطلوبة أو أخرى","subject":"عربي أو كيمياء أو فيزياء أو بحتة أو ميكانيكا أو إنجليزي أو ألماني أو عام","title":"عنوان قصير وواضح","notes":"","dueDate":"YYYY-MM-DD أو فاضي لو مفيش تاريخ واضح","priority":"عالي أو متوسط أو منخفض"}. الرسالة:\n"""'+text+'"""';
+    const result=await sampleApi.json(prompt);
+    const arr=Array.isArray(result)?result:(Array.isArray(result&&result.tasks)?result.tasks:[]);
+    if(!arr.length){ toast('معرفتش أستخرج تاسكات واضحة من الرسالة دي، جرب تضيفها يدويًا.'); return; }
+    const origin=$('#imp-origin').value;
+    importCandidates=arr.map(x=>({
+      origin,
+      type: TYPES.includes(x.type)?x.type:'أخرى',
+      subject: SUBJECTS.some(s=>s.key===x.subject)?x.subject:'عام',
+      title:(x.title||'تاسك بدون عنوان').toString().slice(0,120),
+      notes:(x.notes||'').toString().slice(0,300),
+      dueDate:/^\d{4}-\d{2}-\d{2}$/.test(x.dueDate)?x.dueDate:'',
+      priority: PRIORITY_W[x.priority]?x.priority:'متوسط',
+      include:true,
+    }));
+    renderImportResults();
+  }catch(e){ console.error(e); toast('حصل خطأ أثناء التحليل، جرب تاني.'); }
+  finally{ btn.disabled=false; btn.textContent='🔍 حلل الرسالة'; }
+}
+
+function renderImportResults(){
+  const el=$('#imp-results');
+  if(!importCandidates.length){ el.innerHTML=''; return; }
+  const subjOpts=c=>SUBJECTS.map(s=>'<option value="'+s.key+'"'+(s.key===c.subject?' selected':'')+'>'+s.label+'</option>').join('');
+  const typeOpts=c=>TYPES.map(t=>'<option value="'+t+'"'+(t===c.type?' selected':'')+'>'+t+'</option>').join('');
+  el.innerHTML='<h4 style="margin:14px 0 8px;font-size:.85rem;color:var(--muted);">اتلاقى '+importCandidates.length+' تاسك — راجعها وعدّل أي غلط قبل الإضافة</h4>'+
+    importCandidates.map((c,i)=>`
+      <div class="imp-card" data-idx="${i}">
+        <div class="row2">
+          <label class="check-inline"><input type="checkbox" class="imp-f-include" ${c.include?'checked':''}></label>
+          <input type="text" class="imp-f-title" value="${escapeHtml(c.title)}" placeholder="العنوان">
+        </div>
+        <div class="row2">
+          <select class="imp-f-subject">${subjOpts(c)}</select>
+          <select class="imp-f-type">${typeOpts(c)}</select>
+        </div>
+        <div class="row2">
+          <input type="date" class="imp-f-due" value="${c.dueDate||''}">
+          <select class="imp-f-priority">
+            <option value="عالي"${c.priority==='عالي'?' selected':''}>عالية</option>
+            <option value="متوسط"${c.priority==='متوسط'?' selected':''}>متوسطة</option>
+            <option value="منخفض"${c.priority==='منخفض'?' selected':''}>منخفضة</option>
+          </select>
+        </div>
+        <input type="text" class="imp-f-notes" value="${escapeHtml(c.notes)}" placeholder="تفاصيل (اختياري)">
+      </div>`).join('')+
+    '<div class="modal-actions" style="margin-top:12px;">'+
+    '<button type="button" class="btn-ghost" id="imp-cancel-results">إلغاء</button>'+
+    '<button type="button" class="btn-primary" id="imp-add-selected">➕ ضيف المحدد</button></div>';
+  $$('.imp-card').forEach(card=>{
+    const idx=+card.dataset.idx;
+    card.querySelector('.imp-f-include').onchange=e=>{ importCandidates[idx].include=e.target.checked; };
+    card.querySelector('.imp-f-title').oninput=e=>{ importCandidates[idx].title=e.target.value; };
+    card.querySelector('.imp-f-subject').onchange=e=>{ importCandidates[idx].subject=e.target.value; };
+    card.querySelector('.imp-f-type').onchange=e=>{ importCandidates[idx].type=e.target.value; };
+    card.querySelector('.imp-f-due').onchange=e=>{ importCandidates[idx].dueDate=e.target.value; };
+    card.querySelector('.imp-f-priority').onchange=e=>{ importCandidates[idx].priority=e.target.value; };
+    card.querySelector('.imp-f-notes').oninput=e=>{ importCandidates[idx].notes=e.target.value; };
+  });
+  $('#imp-add-selected').onclick=confirmImport;
+  $('#imp-cancel-results').onclick=()=>{ importCandidates=[]; renderImportResults(); };
+}
+
+function confirmImport(){
+  const toAdd=importCandidates.filter(c=>c.include);
+  let added=0, skipped=0;
+  toAdd.forEach(c=>{
+    const dup=state.tasks.find(t=>!t.isDone && t.title.trim().toLowerCase()===c.title.trim().toLowerCase() && t.subject===c.subject);
+    if(dup){ skipped++; return; }
+    state.tasks.push({id:uid(),createdAt:Date.now(),isDone:false,completedAt:null,
+      origin:c.origin,type:c.type,subject:c.subject,title:c.title,notes:c.notes,dueDate:c.dueDate,priority:c.priority,total:null,done:0,backlog:c.type==='متراكم'});
+    added++;
+  });
+  importCandidates=[];
+  closeImportModal();
+  save();
+  toast('اتضاف '+added+' تاسك'+(skipped?(' (وفيه '+skipped+' مكرر اتجاهله)'):'')+'.');
+}
+
+function buildBacklogText(){
+  const list=state.tasks.filter(t=>!t.isDone && t.backlog).sort((a,b)=>PRIORITY_W[b.priority]-PRIORITY_W[a.priority]);
+  if(!list.length) return 'مفيش متراكم دلوقتي 🎉';
+  const icon={'عالي':'🔴','متوسط':'🟡','منخفض':'🟢'};
+  let out='📋 المتراكم بتاريخ '+fmtDate(todayISO())+':\n';
+  list.forEach(t=>{
+    const s=subjectInfo(t.subject);
+    out+=(icon[t.priority]||'⚪')+' '+s.label+' — '+t.title+(t.notes?(' ('+t.notes+')'):'')+'\n';
+  });
+  return out.trim();
+}
+
+function openShareModal(){
+  $('#share-text').value=buildBacklogText();
+  $('#share-native').style.display=(navigator.share?'block':'none');
+  $('#share-modal').classList.add('show');
+  setTimeout(()=>{ try{ $('#share-text').focus(); $('#share-text').select(); }catch(e){} },50);
+}
+function closeShareModal(){ $('#share-modal').classList.remove('show'); }
+
+async function copyShareText(){
+  const text=$('#share-text').value;
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); toast('✅ اتنسخ، الصقه في واتساب'); return; }
+  }catch(e){}
+  try{ $('#share-text').select(); document.execCommand('copy'); toast('✅ اتنسخ، الصقه في واتساب'); }
+  catch(e){ toast('حدد النص فوق يدويًا وانسخه'); }
+}
+async function nativeShare(){
+  try{ if(navigator.share){ await navigator.share({text:$('#share-text').value,title:'المتراكم'}); } }catch(e){}
+}
+
+function bindEvents(){
+  $('#nav-home').onclick=()=>showTab('home');
+  $('#nav-tasks').onclick=()=>showTab('tasks');
+  $('#nav-backlog').onclick=()=>showTab('backlog');
+  $('#nav-archive').onclick=()=>showTab('archive');
+  $('#fab').onclick=()=>openModal(null);
+  $('#modal-close').onclick=closeModal;
+  $('#modal-overlay').onclick=closeModal;
+  $('#task-form').onsubmit=submitForm;
+  $$('.filter-chip').forEach(b=>{
+    b.onclick=()=>{
+      taskFilter=b.dataset.filter;
+      $$('.filter-chip').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderTasks();
+    };
+  });
+  $('#bl-subject').onchange=e=>{ backlogFilter.subject=e.target.value; renderBacklog(); };
+  $('#bl-type').onchange=e=>{ backlogFilter.type=e.target.value; renderBacklog(); };
+  $('#import-btn').onclick=openImportModal;
+  $('#import-close').onclick=closeImportModal;
+  $('#import-overlay').onclick=closeImportModal;
+  $('#imp-analyze').onclick=analyzeImport;
+  $('#imp-pdf').onchange=handlePdfFile;
+  $('#share-btn').onclick=openShareModal;
+  $('#share-close').onclick=closeShareModal;
+  $('#share-overlay').onclick=closeShareModal;
+  $('#share-copy').onclick=copyShareText;
+  $('#share-native').onclick=nativeShare;
+  document.addEventListener('click', onCardAction);
+}
+
+function init(){
+  $('#today-label').textContent=new Intl.DateTimeFormat('ar-EG',{weekday:'long',day:'numeric',month:'long'}).format(new Date());
+  loadState();
+  normalizeBacklog();
+  bindEvents();
+  render();
+  showTab('home');
+  getArtifactApi().then(api=>{ artifactApi=api; });
+}
+init();
+</script>
+</body>
+</html>
