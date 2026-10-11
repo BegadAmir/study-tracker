@@ -393,6 +393,19 @@ input,select,textarea{border-radius:12px!important}select{min-height:40px;paddin
 .study-app-root .analysis-empty{color:var(--muted);font-size:.85rem;text-align:center;padding:16px 0;}
 
 .study-app-root{max-width:1320px;margin:0 auto;min-height:65vh;border-radius:18px;background:var(--paper);color:var(--ink);position:relative}.study-app-root .study-main{max-width:100%;}
+.study-app-root .homework-plan-card,.study-app-root .homework-note{margin-top:12px}
+.study-app-root .homework-intro,.study-app-root .homework-example,.study-app-root .homework-note p{font-size:.82rem;line-height:1.75;color:var(--muted)}
+.study-app-root .homework-example{border-inline-start:3px solid var(--accent);padding:8px 12px;background:var(--paper);border-radius:10px}
+.study-app-root .homework-status{min-height:1.5rem;font-size:.82rem;color:var(--muted);margin-top:10px}
+.study-app-root .homework-rule{display:flex;align-items:flex-start;gap:9px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--paper);margin:8px 0}
+.study-app-root .homework-rule input{width:auto!important;min-height:auto;margin-top:4px}
+.study-app-root .homework-rule-body{flex:1;min-width:0;font-size:.82rem;line-height:1.65}
+.study-app-root .homework-rule-body small{display:block;color:var(--muted);margin-top:3px}
+.study-app-root .homework-saved-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.study-app-root .homework-saved-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.study-app-root .homework-saved-actions button{min-height:38px}
+.study-app-root nav.tabbar button{min-width:0;padding-inline:2px;font-size:.64rem}
+@media(min-width:700px){.study-app-root nav.tabbar{inset-inline:auto;left:50%;transform:translateX(-50%);width:min(760px,100%);border:1px solid var(--border);border-bottom:0;border-radius:16px 16px 0 0;box-shadow:0 -8px 22px rgba(0,0,0,.08)}.study-app-root .study-main{padding-bottom:112px}}
 </style>
 </head>
 <body>
@@ -438,7 +451,7 @@ input,select,textarea{border-radius:12px!important}select{min-height:40px;paddin
   <button class="icon-btn" id="settings-btn" type="button" aria-label="الإعدادات">⚙️</button>
 </header>
 <main>
-  <nav class="tabs" aria-label="أقسام الموقع"><button class="active" data-page="today-page">اليوم</button><button data-page="study-page">التركيز</button><button data-page="study-app-page">المذاكرة</button><button data-page="reports-page">التقارير</button></nav>
+  <nav class="tabs" aria-label="أقسام الموقع"><button class="active" data-page="today-page">اليوم</button><button data-page="study-page">التركيز والدراسة</button><button data-page="reports-page">التقارير</button></nav>
   <section class="page-panel active" id="today-page">
   <div class="overview-card">
     <h3>✅ إنجاز اليوم</h3>
@@ -471,8 +484,8 @@ input,select,textarea{border-radius:12px!important}select{min-height:40px;paddin
     </div>
     <div><h4>ساعة إيقاف</h4><div class="timer" id="stopwatch-display">00:00:00</div><p class="timer-subtitle" id="stopwatch-status">جاهزة</p><div class="timer-controls"><button class="btn-primary" id="stopwatch-start">ابدأ</button><button class="btn-ghost" id="stopwatch-reset">إعادة</button><button class="btn-ghost" id="stopwatch-log">سجل الوقت</button></div></div>
   </div>
-  <div class="study-entry-grid"><div class="field study-subject-field"><label for="study-subject">المادة</label><input id="study-subject" placeholder="مثال: رياضيات"></div><div class="field"><label for="study-questions">الأسئلة المحلولة</label><input id="study-questions" type="number" min="0" value="0"></div><div class="field"><label for="study-mistakes">الأخطاء المراجعة</label><input id="study-mistakes" type="number" min="0" value="0"></div></div><p id="study-status" class="muted" aria-live="polite"></p></div></section>
-  <section class="page-panel" id="study-app-page"><div id="study-app-root" class="study-app-root">
+  <div class="study-entry-grid"><div class="field study-subject-field"><label for="study-subject">المادة</label><input id="study-subject" placeholder="مثال: رياضيات"></div><div class="field"><label for="study-questions">الأسئلة المحلولة</label><input id="study-questions" type="number" min="0" value="0"></div><div class="field"><label for="study-mistakes">الأخطاء المراجعة</label><input id="study-mistakes" type="number" min="0" value="0"></div></div><p id="study-status" class="muted" aria-live="polite"></p></div>
+  <div id="study-app-root" class="study-app-root">
 <header>
   <div class="header-top">
     <div>
@@ -538,6 +551,22 @@ input,select,textarea{border-radius:12px!important}select{min-height:40px;paddin
     <div id="backlog-list"></div>
   </section>
 
+  <section id="view-homework" class="view">
+    <h2 class="sec-title">🗓️ واجبات الدروس التلقائية</h2>
+    <div class="analysis-card homework-plan-card">
+      <p class="homework-intro">اكتب جدول دروسك والواجب الذي تريد إضافته بعد كل حصة. الذكاء الاصطناعي سيحوّل البرومبت إلى قواعد تراجعها قبل الحفظ.</p>
+      <p class="homework-example">مثال: «كل يوم الاثنين ينتهي درس الرياضيات الساعة ٧ مساءً. بعده أضف أولوية عالية: حل ٢٠ سؤالًا في العربي، والموعد في نفس اليوم».</p>
+      <div class="field"><label for="homework-prompt">برومبت جدول الدروس</label><textarea id="homework-prompt" rows="5" placeholder="اكتب الأيام ووقت انتهاء كل درس والواجب الذي تريد إضافته بعده..."></textarea></div>
+      <p class="ai-disclosure">سيُرسل البرومبت إلى مساعد Google عبر Supabase لتحليله. أوقات الجدول حسب المنطقة الزمنية لجهازك: <b id="homework-timezone">Africa/Cairo</b>.</p>
+      <div class="modal-actions"><button type="button" class="btn-primary" id="homework-analyze">حلّل الجدول</button><button type="button" class="btn-ghost" id="homework-save" disabled>حفظ القواعد المحددة</button></div>
+      <div id="homework-status" class="homework-status" aria-live="polite"></div>
+      <div id="homework-preview"></div>
+    </div>
+    <div id="homework-saved"></div>
+    <div class="analysis-card"><h3>الواجبات التي أُضيفت لمهام اليوم</h3><div id="homework-generated-list" class="homework-generated-list"></div></div>
+    <div class="analysis-card homework-note"><b>كيف يعمل؟</b><p>بعد حفظ الجدول، يضيف Supabase الواجب عند انتهاء الحصة، حتى لو كان الموقع مغلقًا. سيظهر الواجب في مهام اليوم وأولوياته، مرة واحدة لكل حصة.</p></div>
+  </section>
+
   <section id="view-analysis" class="view">
     <h2 class="sec-title">📊 نظرة عامة</h2>
     <div class="analysis-card">
@@ -580,6 +609,7 @@ input,select,textarea{border-radius:12px!important}select{min-height:40px;paddin
   <button id="nav-home" class="active" type="button"><span class="ic">🏠</span>الرئيسية</button>
   <button id="nav-tasks" type="button"><span class="ic">📝</span>المهام</button>
   <button id="nav-backlog" type="button"><span class="ic">🧱</span>المتراكم</button>
+  <button id="nav-homework" type="button"><span class="ic">📚</span>الواجبات</button>
   <button id="nav-analysis" type="button"><span class="ic">📊</span>التحليل</button>
   <button id="nav-archive" type="button"><span class="ic">📦</span>الأرشيف</button>
 </nav>
@@ -816,6 +846,7 @@ let habits=[];     // [{id, name, createdAt:'YYYY-MM-DD'}]
 let checks={};     // {"habitId|YYYY-MM-DD": true}
 let tasks=[];
 let studySessions=[];
+let lessonHomeworkPlan=null,lessonHomeworkDraft=[],lessonHomeworkPlanError='',lessonHomeworkBusy=false,lessonHomeworkSyncHandle=null;
 let editingTaskId=null;
 let timerRemaining=25*60, timerHandle=null, timerIsBreak=false, timerDeadline=0;
 let stopwatchHandle=null,stopwatchElapsed=0,stopwatchStartedAt=0;
@@ -934,6 +965,90 @@ async function saveStudySession(session){
  if(error){console.error(error);toast('تعذر حفظ جلسة الدراسة: '+describeError(error));return false;}return true;
 }
 
+async function refreshDailyTasksFromSupabase(showError=false){
+  if(!sb||!currentUser)return false;
+  const {data,error}=await sb.from('daily_tasks').select('*').eq('user_id',currentUser.id).order('sort_order',{ascending:true});
+  if(error){console.error(error);if(showError)toast('تعذر تحديث أولويات اليوم: '+describeError(error));return false;}
+  const next=data||[];
+  if(JSON.stringify(next)!==JSON.stringify(tasks)){tasks=next;renderAll();}
+  return true;
+}
+function startDailyTasksRefresh(){
+  if(lessonHomeworkSyncHandle)clearInterval(lessonHomeworkSyncHandle);
+  lessonHomeworkSyncHandle=setInterval(()=>{if(!document.hidden)refreshDailyTasksFromSupabase(false);},60000);
+}
+function getLocalTimeZone(){
+  try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Africa/Cairo';}catch(_){return 'Africa/Cairo';}
+}
+function dayNameForHomework(day){return ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][Number(day)]||'يوم غير معروف';}
+function validHomeworkRule(rule){
+  return !!(rule&&Number.isInteger(Number(rule.day_of_week))&&Number(rule.day_of_week)>=0&&Number(rule.day_of_week)<=6&&
+    /^([01]\d|2[0-3]):[0-5]\d$/.test(String(rule.lesson_end_time||''))&&String(rule.lesson_subject||'').trim()&&
+    String(rule.homework_subject||'').trim()&&String(rule.homework_title||'').trim());
+}
+function renderHomeworkPlan(){
+  const status=$('#homework-status'),preview=$('#homework-preview'),saved=$('#homework-saved'),saveBtn=$('#homework-save'),prompt=$('#homework-prompt'),generated=$('#homework-generated-list');
+  if(!status||!preview||!saved||!saveBtn||!prompt||!generated)return;
+  $('#homework-timezone').textContent=getLocalTimeZone();
+  if(!prompt.dataset.initialized){prompt.value=lessonHomeworkPlan?.prompt||'';prompt.dataset.initialized='true';}
+  if(lessonHomeworkPlanError){status.textContent=lessonHomeworkPlan?'تم حفظ الجدول، لكن تشغيله التلقائي لم يكتمل. راجع إعداد SQL والجدولة في Supabase.':'إعداد الواجبات التلقائية غير جاهز. شغّل migration 202610110004_lesson_homework_automation.sql في Supabase.';status.dataset.state='error';}
+  else if(!lessonHomeworkBusy&&!lessonHomeworkDraft.length){status.textContent=lessonHomeworkPlan?'الجدول محفوظ. تُضاف الواجبات بعد انتهاء الحصة في الموعد المحدد.':'اكتب الجدول والواجبات المطلوبة بعد كل حصة، ثم حلّله للمراجعة.';status.dataset.state='';}
+  preview.innerHTML=lessonHomeworkDraft.length?'<h3>راجع القواعد قبل الحفظ</h3>'+lessonHomeworkDraft.map((r,i)=>'<label class="homework-rule"><input type="checkbox" data-homework-rule="'+i+'" checked><span class="homework-rule-body"><b>'+escapeHtml(r.homework_title)+'</b><small>'+escapeHtml(dayNameForHomework(r.day_of_week))+' · انتهاء درس '+escapeHtml(r.lesson_subject)+' الساعة '+escapeHtml(r.lesson_end_time)+' · مادة الواجب: '+escapeHtml(r.homework_subject)+' · الأولوية: '+({high:'عالية',medium:'متوسطة',low:'منخفضة'}[r.priority]||'متوسطة')+'</small>'+(r.description?'<small>'+escapeHtml(r.description)+'</small>':'')+'</span></label>').join(''):'';
+  saveBtn.disabled=lessonHomeworkBusy||!lessonHomeworkDraft.length||!!lessonHomeworkPlanError;
+  const generatedTasks=tasks.filter(t=>String(t.category||'').startsWith('واجب بعد درس ')).sort((a,b)=>String(b.due_date||'').localeCompare(String(a.due_date||''))).slice(0,12);
+  generated.innerHTML=generatedTasks.length?generatedTasks.map(t=>'<div class="homework-rule"><span class="homework-rule-body"><b>'+escapeHtml(t.title)+'</b><small>'+escapeHtml(t.category||'واجب درس')+' · '+escapeHtml(t.due_date||'بدون موعد')+' · '+(t.completed?'منجز':'مفتوح')+'</small></span></div>').join(''):'<p class="muted">لم تُنشأ واجبات بعد. ستظهر هنا بعد موعد الحصة.</p>';
+  if(!lessonHomeworkPlan){saved.innerHTML='';return;}
+  const rules=Array.isArray(lessonHomeworkPlan.rules)?lessonHomeworkPlan.rules:[];
+  saved.innerHTML='<div class="analysis-card"><div class="homework-saved-head"><b>الجدول الحالي · '+(lessonHomeworkPlan.enabled?'مفعّل':'متوقف')+'</b><span class="chip">'+rules.length+' قاعدة</span></div><div>'+rules.map(r=>'<div class="homework-rule"><span class="homework-rule-body"><b>'+escapeHtml(r.homework_title||'واجب')+'</b><small>'+escapeHtml(dayNameForHomework(r.day_of_week))+' · بعد انتهاء '+escapeHtml(r.lesson_subject||'الحصة')+' الساعة '+escapeHtml(r.lesson_end_time||'')+'</small></span></div>').join('')+'</div><div class="homework-saved-actions"><button class="btn-ghost" type="button" id="homework-toggle">'+(lessonHomeworkPlan.enabled?'إيقاف الجدول':'تفعيل الجدول')+'</button><button class="btn-ghost" type="button" id="homework-edit">تعديل البرومبت</button><button class="btn-ghost" type="button" id="homework-delete">حذف الجدول</button></div></div>';
+  $('#homework-toggle').onclick=toggleHomeworkPlan;
+  $('#homework-edit').onclick=()=>{prompt.value=lessonHomeworkPlan?.prompt||'';prompt.dataset.initialized='true';prompt.focus();};
+  $('#homework-delete').onclick=deleteHomeworkPlan;
+}
+async function analyzeHomeworkPrompt(){
+  const prompt=$('#homework-prompt').value.trim();
+  if(!prompt){toast('اكتب جدول الدروس والواجبات أولًا.');return;}
+  lessonHomeworkBusy=true;lessonHomeworkDraft=[];$('#homework-analyze').disabled=true;$('#homework-analyze').textContent='جارٍ تحليل الجدول…';$('#homework-status').textContent='الذكاء الاصطناعي يحلل أيام الدروس ومواعيدها…';renderHomeworkPlan();
+  let data,error;try{({data,error}=await sb.functions.invoke('habit-assistant',{body:{mode:'schedule',prompt,context:{today:todayISOFor(),timezone:getLocalTimeZone()}}}));}catch(e){error=e;}
+  lessonHomeworkBusy=false;$('#homework-analyze').disabled=false;$('#homework-analyze').textContent='حلّل الجدول';
+  if(error){console.error(error);const msg='تعذر تحليل الجدول. حدّث وانشر وظيفة habit-assistant الجديدة في Supabase.';renderHomeworkPlan();$('#homework-status').textContent=msg;$('#homework-status').dataset.state='error';toast(msg);return;}
+  lessonHomeworkDraft=(Array.isArray(data?.lesson_rules)?data.lesson_rules:[]).filter(validHomeworkRule).map(r=>({
+    day_of_week:Number(r.day_of_week),lesson_subject:String(r.lesson_subject).trim().slice(0,80),lesson_end_time:String(r.lesson_end_time),
+    homework_subject:String(r.homework_subject).trim().slice(0,80),homework_title:String(r.homework_title).trim().slice(0,160),
+    description:String(r.description||'').trim().slice(0,1000),priority:['high','medium','low'].includes(r.priority)?r.priority:'medium',
+    estimated_minutes:Math.max(0,Math.min(1440,Number(r.estimated_minutes)||0))
+  }));
+  const analysisNote=lessonHomeworkDraft.length?(data.reply||'راجع القواعد ثم احفظها.'):(data.reply||'لم أجد قواعد مكتملة. اذكر يوم الحصة ووقت انتهائها والواجب المطلوب بوضوح.');
+  renderHomeworkPlan();
+  $('#homework-status').textContent=analysisNote;$('#homework-status').dataset.state=lessonHomeworkDraft.length?'':'error';
+}
+async function saveHomeworkPlan(){
+  const picked=[...document.querySelectorAll('[data-homework-rule]:checked')].map(e=>lessonHomeworkDraft[Number(e.dataset.homeworkRule)]).filter(Boolean);
+  if(!picked.length){toast('حدد قاعدة واحدة على الأقل.');return;}
+  const oldRules=Array.isArray(lessonHomeworkPlan?.rules)?lessonHomeworkPlan.rules:[],usedIds=new Set();
+  const occurrenceKey=r=>[r.day_of_week,r.lesson_end_time,String(r.lesson_subject||'').trim().toLocaleLowerCase(),String(r.homework_subject||'').trim().toLocaleLowerCase(),String(r.homework_title||'').trim().toLocaleLowerCase()].join('|');
+  const row={user_id:currentUser.id,prompt:$('#homework-prompt').value.trim(),timezone:getLocalTimeZone(),enabled:true,updated_at:new Date().toISOString(),rules:picked.map(r=>{const prior=oldRules.find(old=>old.id&&!usedIds.has(old.id)&&occurrenceKey(old)===occurrenceKey(r));const id=prior?.id||uid();usedIds.add(id);return {...r,id};})};
+  $('#homework-save').disabled=true;
+  const {error}=await sb.from('lesson_homework_plans').upsert(row,{onConflict:'user_id'});
+  if(error){console.error(error);lessonHomeworkPlanError=describeError(error);toast('تعذر حفظ جدول الدروس: '+describeError(error));renderHomeworkPlan();return;}
+  lessonHomeworkPlan=row;lessonHomeworkPlanError='';lessonHomeworkDraft=[];$('#homework-prompt').dataset.initialized='true';
+  const {data:inserted,error:processError}=await sb.rpc('process_due_lesson_homework');
+  if(processError){console.error(processError);lessonHomeworkPlanError=describeError(processError);}
+  await refreshDailyTasksFromSupabase(true);renderHomeworkPlan();
+  if(processError)toast('حُفظ الجدول، لكن تعذر تشغيل قواعده الآن. راجع إعداد SQL في Supabase.');
+  else toast(Number(inserted)>0?'تم حفظ الجدول وإضافة '+Number(inserted)+' واجب مستحق.':'تم حفظ الجدول. ستُضاف الواجبات تلقائيًا عند انتهاء مواعيد الدروس.');
+}
+async function toggleHomeworkPlan(){
+  if(!lessonHomeworkPlan)return;const next={...lessonHomeworkPlan,enabled:!lessonHomeworkPlan.enabled,updated_at:new Date().toISOString()};
+  const {error}=await sb.from('lesson_homework_plans').upsert(next,{onConflict:'user_id'});
+  if(error){toast('تعذر تحديث حالة الجدول: '+describeError(error));return;}lessonHomeworkPlan=next;renderHomeworkPlan();
+}
+async function deleteHomeworkPlan(){
+  if(!lessonHomeworkPlan||!await confirmDialog('حذف جدول التكرار؟ الواجبات التي أُنشئت سابقًا ستظل محفوظة.'))return;
+  const {error}=await sb.from('lesson_homework_plans').delete().eq('user_id',currentUser.id);
+  if(error){toast('تعذر حذف الجدول: '+describeError(error));return;}
+  lessonHomeworkPlan=null;lessonHomeworkPlanError='';lessonHomeworkDraft=[];$('#homework-prompt').value='';$('#homework-prompt').dataset.initialized='true';renderHomeworkPlan();toast('تم حذف جدول التكرار.');
+}
+
 async function loadFromSupabase(){
   const {data:settingsRow, error:sErr}=await sb.from('habit_settings').select('*').eq('user_id',currentUser.id).maybeSingle();
   if(sErr){ console.error(sErr); toast('حصل خطأ في تحميل الإعدادات: '+describeError(sErr)); }
@@ -986,6 +1101,17 @@ async function loadFromSupabase(){
   (checkRows||[]).forEach(r=>{ checks[r.habit_id+'|'+r.check_date]=true; });
   const {data:taskRows,error:tErr}=await sb.from('daily_tasks').select('*').eq('user_id',currentUser.id).order('sort_order',{ascending:true});
   if(tErr){console.error(tErr);tasks=[];toast('تعذر تحميل المهام (شغّل ملف migration الخاص بالمهام): '+describeError(tErr));}else tasks=taskRows||[];
+  const {data:homeworkRow,error:homeworkErr}=await sb.from('lesson_homework_plans').select('*').eq('user_id',currentUser.id).maybeSingle();
+  lessonHomeworkPlanError=homeworkErr?describeError(homeworkErr):'';
+  lessonHomeworkPlan=homeworkRow||null;
+  if(!homeworkErr){
+    const {data:inserted,error:processError}=await sb.rpc('process_due_lesson_homework');
+    if(processError){console.error(processError);lessonHomeworkPlanError=describeError(processError);}
+    else if(Number(inserted)>0){
+      const {data:refreshed,error:refreshError}=await sb.from('daily_tasks').select('*').eq('user_id',currentUser.id).order('sort_order',{ascending:true});
+      if(refreshError)console.error(refreshError);else tasks=refreshed||[];
+    }
+  }
   const {data:studyRows,error:stErr}=await sb.from('study_sessions').select('*').eq('user_id',currentUser.id).gte('session_date',addDays(todayISOFor(),-13)).order('session_date',{ascending:false});
   if(stErr){console.error(stErr);studySessions=[];toast('تعذر تحميل جلسات الدراسة: '+describeError(stErr));}else studySessions=studyRows||[];
 }
@@ -1468,6 +1594,7 @@ function renderAll(){
   renderTopHabits();
   renderTasks();
   renderWeeklyReport();
+  renderHomeworkPlan();
 }
 
 /* ---------------- add/edit/delete habit modal ---------------- */
@@ -1614,7 +1741,7 @@ async function saveGeneratedAITasks(){
   if(saved){renderAll();$('#ai-task-preview').innerHTML='';$('#ai-save-tasks').style.display='none';aiGeneratedTasks=[];toast('تم حفظ '+saved+' مهمة.');}
 }
 function bindEvents(){
-  document.querySelectorAll('.tabs [data-page]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.page-panel').forEach(p=>p.classList.toggle('active',p.id===btn.dataset.page));if(btn.dataset.page==='study-app-page'&&typeof globalThis.initializeStudyTracker==='function')globalThis.initializeStudyTracker(sb,currentUser).catch(err=>{console.error(err);toast('تعذر تحميل صفحة المذاكرة.');});}));
+  document.querySelectorAll('.tabs [data-page]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.page-panel').forEach(p=>p.classList.toggle('active',p.id===btn.dataset.page));if(btn.dataset.page==='study-page'&&typeof globalThis.initializeStudyTracker==='function')globalThis.initializeStudyTracker(sb,currentUser).catch(err=>{console.error(err);toast('تعذر تحميل صفحة المذاكرة.');});}));
   $('#add-task-btn').onclick=()=>openTaskModal(null);
   $('#task-cancel').onclick=()=>$('#task-modal').classList.remove('show');
   $('#task-modal-overlay').onclick=()=>$('#task-modal').classList.remove('show');
@@ -1623,6 +1750,9 @@ function bindEvents(){
   $('#ai-mode-chat').onclick=()=>setAIMode('chat');$('#ai-mode-tasks').onclick=()=>setAIMode('tasks');
   $('#ai-send').onclick=sendAIMessage;$('#ai-save-tasks').onclick=saveGeneratedAITasks;
   $('#ai-message').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAIMessage();}});
+  $('#homework-analyze').onclick=analyzeHomeworkPrompt;$('#homework-save').onclick=saveHomeworkPlan;
+  $('#homework-prompt').addEventListener('input',()=>{lessonHomeworkDraft=[];renderHomeworkPlan();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshDailyTasksFromSupabase(false);});
   $('#tasks-list').addEventListener('click',async e=>{const edit=e.target.closest('[data-task-edit]');if(edit){openTaskModal(tasks.find(t=>t.id===edit.dataset.taskEdit));return;}const del=e.target.closest('[data-task-delete]');if(del){deleteTask(del.dataset.taskDelete);return;}const check=e.target.closest('[data-task-done]');if(check){const t=tasks.find(x=>x.id===check.dataset.taskDone);const prev=t.completed;t.completed=check.checked;if(!await persistTask(t)){t.completed=prev;check.checked=prev;}renderAll();}});
   let dragged=null;$('#tasks-list').addEventListener('dragstart',e=>{const row=e.target.closest('[data-task-row]');if(row)dragged=row.dataset.taskRow;});$('#tasks-list').addEventListener('dragover',e=>{if(e.target.closest('[data-task-row]'))e.preventDefault();});$('#tasks-list').addEventListener('drop',async e=>{const row=e.target.closest('[data-task-row]');if(!row||!dragged||dragged===row.dataset.taskRow)return;e.preventDefault();const original=tasks.slice(),orders=new Map(tasks.map(t=>[t.id,t.sort_order])),from=tasks.findIndex(t=>t.id===dragged),to=tasks.findIndex(t=>t.id===row.dataset.taskRow),[item]=tasks.splice(from,1);tasks.splice(to,0,item);tasks.forEach((t,i)=>t.sort_order=i);let ok=true;for(const t of tasks)if(!await persistTask(t)){ok=false;break;}if(!ok){tasks=original;tasks.forEach(t=>t.sort_order=orders.get(t.id));toast('تعذر حفظ الترتيب اليدوي.');}dragged=null;renderAll();});
   $('#task-delete').onclick=async()=>{if(!editingTaskId)return;const id=editingTaskId,before=tasks.length;await deleteTask(id);if(tasks.length<before)$('#task-modal').classList.remove('show');};
@@ -1765,6 +1895,7 @@ async function doHandleSession(session){
     showScreen('loading');
     loadAudioPreferences();
     await loadFromSupabase();
+    startDailyTasksRefresh();
     $('#timer-sound').value=settings.timerSound||'bell';
     loadCustomTimerSound();
     applyTheme(settings.theme);
@@ -1776,9 +1907,13 @@ async function doHandleSession(session){
       showScreen('gate');
     }
   }else{
+    if(lessonHomeworkSyncHandle)clearInterval(lessonHomeworkSyncHandle);lessonHomeworkSyncHandle=null;
     if(timerHandle)clearInterval(timerHandle);timerHandle=null;
     if(stopwatchHandle)clearInterval(stopwatchHandle);stopwatchHandle=null;
     aiHistory=[];aiGeneratedTasks=[];
+    lessonHomeworkPlan=null;lessonHomeworkDraft=[];lessonHomeworkPlanError='';lessonHomeworkBusy=false;
+    $('#homework-prompt').value='';delete $('#homework-prompt').dataset.initialized;
+    if(typeof globalThis.resetIntegratedStudyTracker==='function')globalThis.resetIntegratedStudyTracker();
     currentUser=null;
     timerVolume=70;timerMuted=false;paintAudioControls();
     showScreen('auth');
@@ -2150,7 +2285,7 @@ function renderAnalysis(){
 function render(){ renderHome(); renderTasks(); renderBacklog(); renderArchive(); renderProgress(); renderAnalysis(); }
 
 function showTab(name){
-  ['home','tasks','backlog','analysis','archive'].forEach(n=>{
+  ['home','tasks','backlog','homework','analysis','archive'].forEach(n=>{
     $('#view-'+n).style.display = n===name?'block':'none';
     $('#nav-'+n).classList.toggle('active', n===name);
   });
@@ -2401,6 +2536,7 @@ function bindEvents(){
   $('#nav-home').onclick=()=>showTab('home');
   $('#nav-tasks').onclick=()=>showTab('tasks');
   $('#nav-backlog').onclick=()=>showTab('backlog');
+  $('#nav-homework').onclick=()=>showTab('homework');
   $('#nav-analysis').onclick=()=>showTab('analysis');
   $('#nav-archive').onclick=()=>showTab('archive');
   $('#fab').onclick=()=>openModal(null);
